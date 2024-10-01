@@ -11,23 +11,24 @@ class LoginController extends Controller
         return view("login");
     }
 
-    public function dologin(Request $request) 
+    public function doLogin( Request $request )
     {
-        $validateData = $request->validate([
+        // validate the input
+        $validatedData = $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
+            'password'  => 'required'
         ]);
 
-        // do the password
-            if (auth()->attempt($validateData)) {
-                // regenerate session tokens
-                    $request->session()->regenerate();
-                return redirect("/");
-            } else {
-                // ->widthErrors is used to customize error message if there's a wrongly provided value in the input field above ^
-                    return redirect("/login")->withErrors([
-                        'password' => "The password or email provided does not match our records"
-                    ]);
-            }
+        // do the password check
+        if ( auth()->attempt($validatedData) ) {
+            // regenerate session tokens
+            $request->session()->regenerate();
+            return redirect("/");
+        } else {
+            return back()->withErrors([
+                'email'=> "Email does not exist",
+                'password'=>"Incorrect password"
+            ]);
+        }
     }
 }
